@@ -1,0 +1,61 @@
+Data_Dir = config["Data_Dir"]
+Quantification_Dir = config["Quantification_Dir"]
+SAMPLES_FILE = config["SAMPLES_FILE"]
+SAMPLES = config["SAMPLES"]
+TRINITY_HOME = config["TRINITY_HOME"]
+transcripts = config["transcripts"]
+gene_trans_map = config["gene_trans_map"]
+
+gene_expr_matrix = config["gene_expr_matrix"]
+gene_counts_matrix = config["gene_counts_matrix"]
+
+rule trans_build:
+    input:
+        transcripts
+    output:
+        expand(transcripts + ".{index}.bt2", index=range(1, 5)),
+        expand(transcripts + ".rev.{index}.bt2", index=range(1,3))
+    shell:
+        "rsem-prepare-reference --transcript-to-gene-map {gene_trans_map} --bowtie2 {transcripts} {transcripts}"
+
+
+rule bowtie2:
+    input:
+        transcripts,
+        expand(transcripts + ".{index}.bt2", index=range(1, 5)),
+        expand(transcripts + ".rev.{index}.bt2", index=range(1,3)),
+        left = Data_Dir + "/{sample}_1.fq.gz",
+        right = Data_Dir + "/{sample}_2.fq.gz" 
+    output:
+        Quantification_Dir + "/{sample}/bowtie2.bam"
+    threads: 4
+    shell:
+        "bowtie2 --no-mixed --no-discordant --gbar 1000 --end-to-end -k 200"
+        " -x {transcripts} -1 {input.left} -2 {input.right}"
+        " -p {threads}"
+        " 2> {Quantification_Dir}/{wildcards.sample}.log | "
+        " samtools view -F 4 -S -b | "
+        " samtools sort -n -o {Quantification_Dir}/{wildcards.sample}/bowtie2.bam"
+
+rule rsem:
+    input:
+        Quantification_Dir + "/{sample}/bowtie2.bam"
+    output:
+        Quantification_Dir + "/{sample}/RSEM.isoforms.results"
+    threads: 4
+    shell:
+        "convert-sam-for-rsem {input} {input}.for_rsem;"
+        "rsem-calculate-expression -p 8 --paired-end --bam --estimate-rspd --append-names"
+        " {input}.for_rsem.bam {transcripts} {Quantification_Dir}/{wildcards.sample}/RSEM"
+
+rule merge_rsem:
+    input:
+        expand(Quantification_Dir + "/{sample}/RSEM.isoforms.results", sample=SAMPLES)
+    output:
+        gene_expr_matrix,
+        gene_counts_matrix
+    shell:
+        "{TRINITY_HOME}/util/abundance_estimates_to_matrix.pl"
+        " --est_method RSEM --name_sample_by_basedir --gene_trans_map {gene_trans_map}"
+        " --out_prefix {Quantification_Dir}/my {input}"
+

@@ -1,0 +1,53 @@
+library(purrr)
+library(tidyverse)
+library(clusterProfiler)
+
+########################################################################################
+# clusterProfiler 可能是目前最优秀的富集分析软件，参考网站：
+# https://www.bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html
+# 这里富集分析使用的是通用富集分析方法，参考：http://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#universal-enrichment-analysis
+########################################################################################
+
+################################################
+# 导入自己构建的 OrgDb
+################################################
+library(org.Sindicum.eg.db)
+columns(org.Sindicum.eg.db)
+
+########################################################################################
+# 导入需要进行富集分析的基因列表，并转换为向量
+#########################################################################################
+gene_list <- read_csv("input/gene.list", col_names = FALSE)
+gene_list <- as.character(gene_list$X1)
+
+################################################
+# 从 OrgDB 提取 Pathway 和基因的对应关系
+################################################
+
+pathway2gene <- AnnotationDbi::select(org.Sindicum.eg.db, 
+                                      keys = keys(org.Sindicum.eg.db), 
+                                      columns = c("Pathway")) %>%
+  na.omit() %>%
+  dplyr::select(Pathway, GID)
+
+################################################
+# 导入 Pathway 与名称对应关系
+################################################
+load("kegg_info.RData")
+
+#KEGG pathway 富集
+ekp <- enricher(gene_list, 
+                TERM2GENE = pathway2gene, 
+                TERM2NAME = pathway2name, 
+                pvalueCutoff = 1, 
+                qvalueCutoff = 1,
+                pAdjustMethod = "BH",
+                minGSSize = 1)
+
+ekp_results <- as.data.frame(ekp)
+
+barplot(ekp, showCategory=20, x = "GeneRatio")
+
+dotplot(ekp)
+
+emapplot(ekp)

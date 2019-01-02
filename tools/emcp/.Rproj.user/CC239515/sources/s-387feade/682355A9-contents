@@ -1,0 +1,3 @@
+library(dplyr)
+
+a <- rename(my_emapper, query_name = "#query_name")

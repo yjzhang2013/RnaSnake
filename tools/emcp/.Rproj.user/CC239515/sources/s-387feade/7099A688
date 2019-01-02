@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1546135887915.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "7099A688",
+    "lastKnownWriteTime" : 3418080863163081773,
+    "last_content_update" : 1546135887915,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "B4CFADBF",
+        "caption" : "my.gene.counts.matrix.Case_vs_Control.DESeq2",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=my.gene.counts.matrix.Case_vs_Control.DESeq2&cache_key=B4CFADBF",
+        "displayedObservations" : 317,
+        "environment" : "",
+        "object" : "my.gene.counts.matrix.Case_vs_Control.DESeq2",
+        "preview" : 0,
+        "totalObservations" : 317,
+        "variables" : 10
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

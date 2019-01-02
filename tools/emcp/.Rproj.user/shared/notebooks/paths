@@ -1,0 +1,8 @@
+/home/zhxd/development/02.RNA-seq/RNASeq-denovo/tools/emcp/enrich.R="25D3BB09"
+/home/zhxd/development/emcp/GOenrich.R="D5C4907B"
+/home/zhxd/development/emcp/KEGGPathwayEnrich.R="4AAECDC4"
+/home/zhxd/development/emcp/annoStat.R="889EEF79"
+/home/zhxd/development/emcp/annotationStat.R="5F8AD115"
+/home/zhxd/development/emcp/do_enrich.R="B835C06C"
+/home/zhxd/development/emcp/makeOrgPackageFromEmapper.R="39C183BC"
+/home/zhxd/development/emcp/parse_kegg_json.R="AE68C5E5"

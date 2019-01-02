@@ -1,0 +1,33 @@
+bash: /pub/anaconda3/lib/libtinfo.so.5: no version information available (required by bash)
+]0;/home/zhxd/development/emcp]0;zhxd@GenekServer-0: ~/development/emcpzhxd@GenekServer-0:~/development/emcp$ [K]0;zhxd@GenekServer-0: ~/development/emcpzhxd@GenekServer-0:~/development/emcp$ ll
+total 7112
+-rw-r--r-- 1 zhxd zhxd    3442 Dec 29 10:12 annoStat.R
+-rw-r--r-- 1 zhxd zhxd     143 Dec 29 10:12 anno_stat.txt
+-rw-r--r-- 1 zhxd zhxd     358 Dec 26 12:43 annotationStat.R
+-rw-rw-r-- 1 zhxd zhxd    1640 Dec 25 16:04 cog_funclass.tab
+-rw-r--r-- 1 zhxd zhxd    6112 Dec 28 17:17 cog.pdf
+-rw-r--r-- 1 zhxd zhxd     499 Dec 25 14:03 do_enrich.R
+-rw-r--r-- 1 zhxd zhxd     205 Dec 29 09:05 emcp.Rproj
+-rw-rw-r-- 1 zhxd zhxd 1328001 Dec 28 10:05 gene_annotation.RData
+-rw-r--r-- 1 zhxd zhxd     465 Dec 25 14:03 get_ko_pathway.R
+-rw-r--r-- 1 zhxd zhxd    7045 Dec 28 14:39 ggo.pdf
+-rw-r--r-- 1 zhxd zhxd    2209 Dec 25 14:03 GOenrich.R
+-rw-r--r-- 1 zhxd zhxd    7068 Dec 28 17:17 go.pdf
+drwxrwxr-x 2 zhxd zhxd    4096 Dec 28 17:28 [0m[01;34minput[0m/
+-rw-r--r-- 1 zhxd zhxd 1460850 Dec 26 10:09 kegg_info.RData
+-rw-r--r-- 1 zhxd zhxd    2106 Dec 25 14:03 KEGGPathwayEnrich.R
+-rw-r--r-- 1 zhxd zhxd 4388652 Dec 25 14:03 ko00001.json
+-rw-r--r-- 1 zhxd zhxd    4658 Dec 29 09:19 makeOrgPackageFromEmapper.R
+-rw------- 1 zhxd zhxd    4357 Dec 28 10:07 nohup.out
+drwxrwxr-x 5 zhxd zhxd    4096 Dec 28 10:07 [01;34morg.My.eg.db[0m/
+-rw-r--r-- 1 zhxd zhxd    1553 Dec 26 10:08 parse_kegg_json.R
+-rw-r--r-- 1 zhxd zhxd    4932 Dec 28 14:47 pathway.pdf
+]0;/home/zhxd/development/emcp]0;zhxd@GenekServer-0: ~/development/emcpzhxd@GenekServer-0:~/development/emcp$ less -S anno_S[Kstat.txt 
+less: /pub/anaconda3/lib/libtinfo.so.5: no version information available (required by less)
+]0;/home/zhxd/development/emcp]0;zhxd@GenekServer-0: ~/development/emcpzhxd@GenekServer-0:~/development/emcp$ less -S anno_stat.txt 
+less: /pub/anaconda3/lib/libtinfo.so.5: no version information available (required by less)
+]0;/home/zhxd/development/emcp]0;zhxd@GenekServer-0: ~/development/emcpzhxd@GenekServer-0:~/development/emcp$ less -S anno_stat.txt 
+less: /pub/anaconda3/lib/libtinfo.so.5: no version information available (required by less)
+]0;/home/zhxd/development/emcp]0;zhxd@GenekServer-0: ~/development/emcpzhxd@GenekServer-0:~/development/emcp$ less -S anno_stat.txt 
+less: /pub/anaconda3/lib/libtinfo.so.5: no version information available (required by less)
+]0;/home/zhxd/development/emcp]0;zhxd@GenekServer-0: ~/development/emcpzhxd@GenekServer-0:~/development/emcp$ 

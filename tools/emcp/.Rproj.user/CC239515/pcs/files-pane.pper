@@ -1,0 +1,9 @@
+{
+    "path" : "~/development/02.RNA-seq/RNASeq-denovo/tools/emcp",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

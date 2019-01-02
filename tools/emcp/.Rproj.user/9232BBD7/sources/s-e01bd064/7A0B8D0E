@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1545964480307.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "7A0B8D0E",
+    "lastKnownWriteTime" : 1546049714,
+    "last_content_update" : 1546049714624,
+    "path" : "~/development/emcp/annoStat.R",
+    "project_path" : "annoStat.R",
+    "properties" : {
+        "cursorPosition" : "99,47",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

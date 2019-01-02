@@ -1,0 +1,130 @@
+######################################################
+# RNA-Seq Denovo Assembly
+######################################################
+Data_Dir = config["Data_Dir"]
+Assembly_Dir = config["Assembly_Dir"]
+TRINITY_HOME= config["TRINITY_HOME"]
+SAMPLES_FILE = config["SAMPLES_FILE"]
+SAMPLES = config["SAMPLES"]
+trinity_max_memory = config["trinity_max_memory"]
+busco_database = config["busco_database"]
+
+rule trinity:
+    input:
+        fq = expand(Data_Dir +"/{sample}_{pair}.fq.gz", sample=SAMPLES, pair=config["PAIRS"]),
+    output:
+        Assembly_Dir + "/trinity_out_dir.Trinity.fasta",
+        Assembly_Dir + "/trinity_out_dir.Trinity.fasta.gene_trans_map"
+    threads: 22
+    shell:
+        "{TRINITY_HOME}/Trinity --seqType fq" +
+        " --output {Assembly_Dir}/trinity_out_dir" +
+        " --max_memory {trinity_max_memory}" +
+        " --samples_file {SAMPLES_FILE}" +
+        " --CPU {threads}" +
+        " --full_cleanup"
+
+rule trinity_stat:
+    input:
+        Assembly_Dir + "/trinity_out_dir.Trinity.fasta"
+    output:
+        Assembly_Dir + "/trinity_out_dir.Trinity.fasta.txt"
+    shell:
+        "{TRINITY_HOME}/util/TrinityStats.pl "
+        "{input} >{output} "
+
+rule salmon_index:
+    input:
+        Assembly_Dir + "/trinity_out_dir.Trinity.fasta"
+    output:
+        directory(Assembly_Dir + "/trinity_out_dir.Trinity")
+    shell:
+        "salmon index --index {output} --transcripts {input}"
+
+rule salmon_quant:
+    input:
+        directory(Assembly_Dir +"/trinity_out_dir.Trinity"),
+        left = Data_Dir + "/{sample}_1.fq.gz",
+        right = Data_Dir + "/{sample}_2.fq.gz"
+    output:
+        Assembly_Dir + "/{sample}.out/aux_info/eq_classes.txt"
+    shell:
+        "salmon quant --index {input} -l A --dumpEq " +
+        " -1 {input.left} -2 {input.right}"
+        " --output {Assembly_Dir}/{wildcards.sample}.out"
+
+rule corset:
+    input:
+        expand(Assembly_Dir + "/{sample}.out/aux_info/eq_classes.txt", sample=config["SAMPLES"])
+    output:
+        Assembly_Dir + "/corset-clusters.txt",
+        Assembly_Dir + "/corset-counts.txt"
+    shell:
+        "corset -D 99999999999 -g " + ",".join(SAMPLES.values()) +
+        " -n " + ",".join(SAMPLES.keys()) +
+        " -i salmon_eq_classes " + 
+        " -p {Assembly_Dir}/corset" +
+        " {input}"
+
+rule corset_trans_map:
+    input:
+        clusters = Assembly_Dir + "/corset-clusters.txt",
+        transcripts = Assembly_Dir + "/trinity_out_dir.Trinity.fasta"
+    output:
+        all_cluster = Assembly_Dir + "/corset-all_clusters.txt",
+        clusters_trans_map = Assembly_Dir + "/corset-clusters_trans_map.txt"
+    run:
+        fi = open(input.clusters, 'r')
+        fo1 = open(output.all_cluster, 'w+')
+        fo2 = open(output.clusters_trans_map, 'w+')
+        trans2clust = {}
+        for line in fi:
+            line = line.strip()
+            (trans, clust) = line.split('\t')
+            trans2clust[trans] = clust
+            fo2.write(clust + "\t" + clust + "_" + trans + "\n")
+        fo1.write('\n'.join(set(trans2clust.values())))
+        fi.close()
+        fo1.close()
+        fo2.close() 
+
+rule fetchClusterSeqs:
+    input:
+        transcripts = Assembly_Dir + "/trinity_out_dir.Trinity.fasta",
+        all_cluster = Assembly_Dir + "/corset-all_clusters.txt",
+        clusters = Assembly_Dir + "/corset-clusters.txt",
+    output:
+        corset_fa = Assembly_Dir + "/corset.fasta",
+        corset_fa_stat = Assembly_Dir + "/corset.fasta.txt"
+    shell:
+        "source activate py27;"
+        "python2 tools/Corset-tools/fetchClusterSeqs.py"
+        " -i {input.transcripts} "
+        " -t {input.all_cluster} "
+        " -o {output.corset_fa} "
+        " -c {input.clusters} ;"
+        "source deactivate;"
+	"perl script/CorsetStats.pl {output.corset_fa} > {output.corset_fa_stat}"
+
+rule lace:
+    input:
+        transcripts = Assembly_Dir + "/trinity_out_dir.Trinity.fasta",
+        clusters = Assembly_Dir + "/corset-clusters.txt",
+    output:
+        Assembly_Dir + "/SuperDuper.fasta"
+    threads: 10
+    shell:
+        "Lace.py {input.transcripts} {input.clusters} -t --cores {threads} -o {Assembly_Dir}"
+
+rule busco:
+    input:
+        Assembly_Dir + "/SuperDuper.fasta"
+    output:
+        Assembly_Dir + "/run_busco/short_summary_busco.txt"
+    shell:
+        "cd {Assembly_Dir};"
+        "wget https://busco.ezlab.org/datasets/eukaryota_odb9.tar.gz;"
+        "tar -zxf {busco_database}.tar.gz;"
+        "cd ../ ;"
+        "run_busco -i {input} -m tran -l {Assembly_Dir}/{busco_database} -o busco;"
+        "mv run_busco {Assembly_Dir}/"

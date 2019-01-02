@@ -1,0 +1,90 @@
+# library -----------------------------------------------------------------
+library(tidyverse)
+library(stringr)
+library(KEGGREST)
+library(AnnotationForge)
+
+
+# input -------------------------------------------------------------------
+f_emapper_anno = "input/sesame.emapper.annotations"
+author = "zhangxudong <zhangxudong@genek.tv>"
+tax_id = "4182"
+genus = "Sesamum" 
+species = "indicum"
+
+# read emapper result
+emapper <- read_delim(f_emapper_anno,
+                      "\t", escape_double = FALSE, trim_ws = TRUE)
+
+# extract gene name from emapper ------------------------------------------
+gene_info <- emapper %>%
+  dplyr::select(GID = query_name, GENENAME = `eggNOG annot`) %>%
+  na.omit()
+
+# extract go annotation from emapper --------------------------------------
+gos <- emapper %>%
+  dplyr::select(query_name, GO_terms) %>%
+  na.omit()
+
+gene2go = data.frame(GID = character(),
+                     GO = character(),
+                     EVIDENCE = character())
+
+for (row in 1:nrow(gos)) {
+  the_gid <- gos[row, "query_name"][[1]]
+  the_gos <- str_split(gos[row,"GO_terms"], ",", simplify = FALSE)[[1]]
+  
+  df_temp <- data_frame(GID = rep(the_gid, length(the_gos)),
+                        GO = the_gos,
+                        EVIDENCE = rep("IEA", length(the_gos)))
+  gene2go <- rbind(gene2go, df_temp)
+}
+
+
+# extract kegg pathway annotation from emapper ----------------------------
+gene2ko <- emapper %>%
+  dplyr::select(GID = query_name, Ko = KEGG_KOs) %>%
+  na.omit()
+
+load(file = "kegg_info.RData")
+gene2pathway <- gene2ko %>% left_join(ko2pathway, by = "Ko") %>% 
+  dplyr::select(GID, Pathway) %>%
+  na.omit()
+
+
+# extract COG annotation from emapper -------------------------------------
+cog_funclass <- read_delim("cog_funclass.tab", 
+                           "\t", escape_double = FALSE, trim_ws = TRUE)
+
+cogs <- emapper %>%
+  dplyr::select(query_name, COG = `COG cat`) %>%
+  na.omit()
+
+gene2cog = data.frame(GID = character(),
+                     COG = character())
+
+for (row in 1:nrow(cogs)) {
+  the_gid <- cogs[row, "query_name"][[1]]
+  the_cogs <- str_trim(str_split(cogs[row,"COG"], ",", simplify = FALSE)[[1]])
+  
+  df_temp <- data_frame(GID = rep(the_gid, length(the_cogs)),
+                        COG = the_cogs)
+  gene2cog <- rbind(gene2cog, df_temp)
+}
+
+gene2cog <- gene2cog %>% left_join(cog_funclass, by = "COG")
+
+# make OrgDb --------------------------------------------------------------
+makeOrgPackage(gene_info=gene_info,
+               go=gene2go,
+               ko=gene2ko,
+               pathway=gene2pathway,
+               cog=gene2cog,
+               maintainer=author,
+               author=author,
+               outputDir = ".",
+               tax_id=tax_id,
+               genus=genus,
+               species=species,
+               goTable="go",
+               version="1.0")

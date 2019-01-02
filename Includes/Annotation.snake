@@ -1,0 +1,50 @@
+######################################################
+# Annotation with eggnog-mapper
+######################################################
+Annotation_Input = config["Annotation_Input"]
+Annotation_Dir = config["Annotation_Dir"]
+EMAPPER_HOME = config["EMAPPER_HOME"]
+split_size = config["split_size"]
+
+rule split:
+    input:
+        Annotation_Input
+    output:
+        dynamic(Annotation_Dir + "/input_split/{chunk}.fasta")
+    shell:
+        "seqkit split -s {split_size} -O {Annotation_Dir}/input_split {input}"
+
+rule homology_searches:
+    input:
+        Annotation_Dir + "/input_split/{chunk}.fasta"
+    output:
+        Annotation_Dir + "/input_split/{chunk}.emapper.seed_orthologs"
+    threads: 10
+    shell:
+        "export PATH={EMAPPER_HOME}/bin:$PATH;"
+        "python2 {EMAPPER_HOME}/emapper.py --translate -m diamond --no_annot --no_file_comments " +
+        " -i {input} -o {Annotation_Dir}/input_split/{wildcards.chunk}"  + 
+        " --cpu {threads}"
+
+rule annotation:
+    input:
+        dynamic(Annotation_Dir + "/input_split/{chunk}.emapper.seed_orthologs")
+    output:
+        Annotation_Dir + "/my.emapper.annotations"
+    threads: 10
+    shell:
+        "cat {input} > {Annotation_Dir}/emapper.seed_orthologs;" 
+        "python2 {EMAPPER_HOME}/emapper.py --annotate_hits_table {Annotation_Dir}/emapper.seed_orthologs"
+        " -o {Annotation_Dir}/my "
+        " --cpu {threads}"
+
+rule makeOrgDB:
+    input:
+        Annotation_Dir + "/my.emapper.annotations"
+    output:
+        Annotation_Dir + "/anno_stat.txt",
+        directory(Annotation_Dir + "/org.My.eg.db")
+    shell:
+        """grep -v "^# " {input} | sed "s/#//">{input}.clean;"""
+        "cd {Annotation_Dir};"
+        "Rscript ../tools/emcp/makeOrgPackageFromEmapper.R ../{input}.clean"

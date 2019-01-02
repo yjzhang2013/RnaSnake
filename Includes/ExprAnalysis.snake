@@ -1,0 +1,49 @@
+gene_expr_matrix = config["gene_expr_matrix"] 
+gene_counts_matrix = config["gene_counts_matrix"] 
+TRINITY_HOME = config["TRINITY_HOME"]
+SAMPLES_FILE = config["SAMPLES_FILE"]
+ExprAnalysis_Dir = config["ExprAnalysis_Dir"]
+pc_num = config["pc_num"]
+de_method = config["de_method"]
+
+rule sample_cor:
+    input:
+        gene_expr_matrix
+    output:
+        ExprAnalysis_Dir + "/sample_cor/my.minRow10.sample_cor.dat",
+        ExprAnalysis_Dir + "/sample_cor/my.minRow10.sample_cor_matrix.pdf"
+    shell:
+        "mkdir -p {ExprAnalysis_Dir}/sample_cor;"
+        "{TRINITY_HOME}/Analysis/DifferentialExpression/PtR"
+        " --matrix {gene_expr_matrix}"
+        " --samples {SAMPLES_FILE}"
+        " --min_rowSums 10"
+        " --sample_cor_matrix"
+        " --output {ExprAnalysis_Dir}/sample_cor/my"
+
+rule pca:
+    input:
+        gene_expr_matrix
+    output:
+        ExprAnalysis_Dir + "/pca/my.minRow10.PCA.prcomp.scores",
+        ExprAnalysis_Dir + "/pca/my.minRow10.prcomp.principal_components.pdf"
+    shell:
+        "mkdir -p {ExprAnalysis_Dir}/pca;"
+        "{TRINITY_HOME}/Analysis/DifferentialExpression/PtR"
+        " --matrix {gene_expr_matrix}"
+        " --samples {SAMPLES_FILE}"
+        " --min_rowSums 10"
+        " --prin_comp {pc_num}"
+        " --add_prin_comp_heatmaps 10"
+        " --output {ExprAnalysis_Dir}/pca/my"
+
+rule deg:
+    input:
+        gene_counts_matrix
+    output:
+        dynamic(ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{Case_vs_Control}.DESeq2.DE_results")
+    shell:
+        "perl {TRINITY_HOME}/Analysis/DifferentialExpression/run_DE_analysis.pl"
+        " --matrix {input} --method {de_method}"
+        " --samples_file {SAMPLES_FILE}"
+        " --output {ExprAnalysis_Dir}/deg"

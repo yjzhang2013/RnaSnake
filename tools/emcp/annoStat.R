@@ -1,0 +1,109 @@
+# parse parameter ---------------------------------------------------------
+library(argparser, quietly=TRUE)
+# Create a parser
+p <- arg_parser("statistics and plot, must run after makeOrgPackageFromEmapper.R")
+
+# Add command line arguments
+p <- add_argument(p, "all_gene", help="all gene id list", type="character")
+p <- add_argument(p, "out_dir", help="output directory", type="character")
+
+# Parse the command line arguments
+argv <- parse_args(p)
+
+
+# load library and data ---------------------------------------------------
+
+library(org.My.eg.db)
+library(clusterProfiler)
+library(dplyr)
+library(ggplot2)
+library(formattable)
+columns(org.My.eg.db)
+
+all_gene <- as.character(read.table(argv$all_gene, quote="\"", comment.char="")$V1)
+load("gene_annotation.RData")
+
+# GO statistics and plot --------------------------------------------------
+
+go_bp <- groupGO(gene     = all_gene,
+               OrgDb    = org.My.eg.db,
+               keyType  = "GID",
+               ont      = "BP",
+               level    = 2,
+               readable = FALSE)
+
+go_bp <- as.data.frame(go_bp)
+go_bp$GO_Class <- "Biological Process"
+
+go_cc <- groupGO(gene     = all_gene,
+                 OrgDb    = org.My.eg.db,
+                 keyType  = "GID",
+                 ont      = "CC",
+                 level    = 2,
+                 readable = FALSE)
+
+go_cc <- as.data.frame(go_cc)
+go_cc$GO_Class <- "Cellular Component"
+
+go_mf <- groupGO(gene     = all_gene,
+                 OrgDb    = org.My.eg.db,
+                 keyType  = "GID",
+                 ont      = "MF",
+                 level    = 2,
+                 readable = FALSE)
+go_mf <- as.data.frame(go_mf)
+go_mf$GO_Class <- "Molecular Function"
+
+go_all <- rbind(go_bp, go_cc, go_mf)
+
+p <- ggplot(go_all) + 
+  geom_histogram(aes(x = Description, 
+                     y = Count,
+                     fill = GO_Class),
+                 stat = "identity") + facet_wrap(~GO_Class, scales = "free_x") + 
+  labs(title = "GO function classification", y = "Number of genes") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.4),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+
+ggsave("go.pdf", p, width = 20, height = 7)
+
+
+# Pathway statistics and plot ---------------------------------------------
+
+
+# COG statistics and plot -------------------------------------------------
+gene2cog$COG_Name = paste("(", gene2cog$COG, ")", gene2cog$COG_Name, sep = " ")
+
+p <- ggplot(data = gene2cog) + 
+  geom_bar(aes(x = COG, 
+               fill = COG_Name)) +
+  labs(title = "COG/KOG Function Classification ", 
+       x = "",
+       y = "Number of genes") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.title = element_blank(),
+        legend.key.size=unit(1,"line"),
+        legend.text = element_text(size = 7.5)) +
+  guides(fill=guide_legend(ncol=1))
+ggsave("cog.pdf", p)
+
+
+
+# number and percentage ---------------------------------------------------
+total_gene = length(all_gene)
+eggnog_anno = length(gene_info$GID)
+go_anno = length(unique(gene2go$GID))
+cog_anno = length(unique(gene2cog$GID))
+pathway_anno = length(unique(gene2pathway$GID))
+
+anno_stat <- data_frame(
+  database = c("EggNOG", "GO", "COG/KOG", "KEGG Pathway"),
+  number = comma(c(eggnog_anno, go_anno, cog_anno, pathway_anno), digits = 0),
+  percentage = percent(c(eggnog_anno, go_anno, cog_anno, pathway_anno)/total_gene)
+)
+
+write.table(anno_stat, "anno_stat.txt", quote = F, row.names = F, sep = "\t")
