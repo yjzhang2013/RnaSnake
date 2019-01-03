@@ -7,13 +7,13 @@
     "folds" : "",
     "hash" : "0",
     "id" : "C75C33A",
-    "lastKnownWriteTime" : 1546077182,
-    "last_content_update" : 1546077182633,
+    "lastKnownWriteTime" : 1546521757,
+    "last_content_update" : 1546521757553,
     "path" : "~/development/02.RNA-seq/RNASeq-denovo/tools/emcp/makeOrgPackageFromEmapper.R",
     "project_path" : "makeOrgPackageFromEmapper.R",
     "properties" : {
-        "cursorPosition" : "0,0",
-        "scrollLine" : "0"
+        "cursorPosition" : "215,28",
+        "scrollLine" : "204"
     },
     "relative_order" : 1,
     "source_on_save" : false,

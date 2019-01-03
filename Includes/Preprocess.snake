@@ -1,0 +1,11 @@
+rule fastp:
+    input:
+        left = config["Raw_Data_Dir"] + "/{sample}_1.fq.gz",
+        right = config["Raw_Data_Dir"] + "/{sample}_2.fq.gz"
+    output:
+        left = config["Data_Dir"] + "/{sample}_1.fq.gz",
+        right = config["Data_Dir"] + "/{sample}_2.fq.gz",
+        html = config["Data_Dir"] + "/{sample}.html",
+        json = config["Data_Dir"] + "/{sample}.json"
+    shell:
+        "fastp -i {input.left} -I {input.right} -o {output.left} -O {output.right} -h {output.html} -j {output.json}"

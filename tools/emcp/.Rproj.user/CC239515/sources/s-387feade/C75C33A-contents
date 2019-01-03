@@ -10,6 +10,7 @@ p <- add_argument(p, "out_dir", help="output directory", type="character")
 
 # Parse the command line arguments
 argv <- parse_args(p)
+script_dir <- dirname(strsplit(commandArgs(trailingOnly = FALSE)[4],"=")[[1]][2])
 
 # function:make OrgDB -----------------------------------------------------
 library(tidyverse)
@@ -70,7 +71,7 @@ makeOrgPackageFromEmapper <- function(f_emapper_anno,
     dplyr::select(GID = query_name, Ko = KEGG_KOs) %>%
     na.omit()
   
-  load(file = "tools/emcp/kegg_info.RData")
+  load(file = paste(script_dir, "kegg_info.RData", sep = "/"))
   gene2pathway <- gene2ko %>% left_join(ko2pathway, by = "Ko") %>%
     left_join(pathway2name, by = "Pathway") %>%
     dplyr::select(GID, Pathway, Pathway_Name, Pathway_Class) %>%
@@ -78,7 +79,7 @@ makeOrgPackageFromEmapper <- function(f_emapper_anno,
   
   
   # extract COG annotation from emapper -------------------------------------
-  cog_info <- read_delim("tools/emcp/cog_funclass.tab", 
+  cog_info <- read_delim(paste(script_dir, "cog_funclass.tab", sep = "/"), 
                          "\t", escape_double = FALSE, trim_ws = TRUE)
   
   cogs <- emapper %>%

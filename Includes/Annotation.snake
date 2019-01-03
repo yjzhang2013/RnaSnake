@@ -40,11 +40,11 @@ rule annotation:
 
 rule makeOrgDB:
     input:
-        Annotation_Dir + "/my.emapper.annotations"
+        emapper = Annotation_Dir + "/my.emapper.annotations",
+        all_gene = config["all_gene"]
     output:
         Annotation_Dir + "/anno_stat.txt",
         directory(Annotation_Dir + "/org.My.eg.db")
     shell:
-        """grep -v "^# " {input} | sed "s/#//">{input}.clean;"""
-        "cd {Annotation_Dir};"
-        "Rscript ../tools/emcp/makeOrgPackageFromEmapper.R ../{input}.clean"
+        """grep -v "^# " {input.emapper} | sed "s/#//">{input.emapper}.clean;"""
+        "Rscript tools/emcp/makeOrgPackageFromEmapper.R {input.emapper}.clean {input.all_gene} {Annotation_Dir}"
