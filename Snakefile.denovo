@@ -2,7 +2,7 @@ configfile: "config.yaml"
 rule all:
     input:
         config["Assembly_Dir"] + "/corset.fasta",
-	config["Assembly_Dir"] + "/corset.fasta.txt",
+	    config["Assembly_Dir"] + "/corset.fasta.txt",
         config["Assembly_Dir"] + "/corset-clusters_trans_map.txt",
         config["Assembly_Dir"] + "/SuperDuper.fasta",
         config["Assembly_Dir"] + "/run_busco/short_summary_busco.txt",
