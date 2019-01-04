@@ -1,0 +1,54 @@
+#############################################
+# Sample Info
+#############################################
+SAMPLES_FILE: samples.txt
+Raw_Data_Dir: test_data
+Data_Dir: Preprocess
+
+PAIRS:
+    - 1
+    - 2
+
+genome:
+gtf:
+
+#############################################
+# Filter and QC
+#############################################
+Preprocess_Dir: Preprocess 
+
+#############################################
+# Assembly
+#############################################
+TRINITY_HOME: /pub/anaconda3/opt/trinity-2.8.4/
+Assembly_Dir: Assembly
+Quantification_Dir: Quantification
+trinity_max_memory: 50G
+busco_database: eukaryota_odb9
+transcripts: Assembly/corset.fasta
+gene_trans_map: Assembly/corset-clusters_trans_map.txt
+
+#############################################
+# Quantification
+#############################################
+Quantification_Dir: Quantification
+gene_expr_matrix: Quantification/my.gene.TMM.EXPR.matrix
+gene_counts_matrix: Quantification/my.gene.counts.matrix
+
+#############################################
+# Annotation
+#############################################
+EMAPPER_HOME: /pub/software/eggnog-mapper-1.0.3
+Annotation_Dir: Annotation
+Annotation_Input: Assembly/SuperDuper.fasta
+split_size: 10000
+all_gene: Assembly/corset-all_clusters.txt
+
+#############################################
+# Expression Analysis
+#############################################
+ExprAnalysis_Dir: ExprAnalysis
+pc_num: 3
+de_method: DESeq2
+de_log2FoldChange: 1
+de_padj: 0.3

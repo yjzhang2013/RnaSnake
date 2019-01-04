@@ -47,4 +47,5 @@ rule makeOrgDB:
         directory(Annotation_Dir + "/org.My.eg.db")
     shell:
         """grep -v "^# " {input.emapper} | sed "s/#//">{input.emapper}.clean;"""
-        "Rscript tools/emcp/makeOrgPackageFromEmapper.R {input.emapper}.clean {input.all_gene} {Annotation_Dir}"
+        "Rscript tools/emcp/makeOrgPackageFromEmapper.R {input.emapper}.clean {input.all_gene} {Annotation_Dir};"
+        "rm gene_annotation.RData"

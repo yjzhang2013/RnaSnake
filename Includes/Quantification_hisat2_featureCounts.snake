@@ -1,0 +1,47 @@
+rule hisat2-build:
+    input:
+        genome = config["genome"]
+    output:
+        expand(config["genome"] + "{index}.ht2"), index = range(1,9)
+    log:
+        config["Quantification_Dir"] + "/hisat2-build.log"
+    shell:
+        "hisat2-build {input.genome} {input.genome} 1>{log} 2>&1"
+
+rule hisat2:
+    input:
+        expand(config["genome"] + "{index}.ht2"), index = range(1,9),
+        left = config["Data_Dir"] + "/{sample}_1.fq.gz",
+        right = config["Data_Dir"] + "/{sample}_2.fq.gz"
+    output:
+        bam = config["Quantification_Dir"] + "/{sample}.bam"
+    threads: 6
+    log: config["Quantification_Dir"] + "/{sample}.hisat2.log"
+    shell:
+        "hisat2 --new-summary -p {threads} -x " + config["genome"] + 
+        " -1 {input.left} -2 {input.right}"
+        " -S {wildcards.sam}"
+        " 1>{log} 2>&1 | "
+        " samtools view -Sb - | "
+        " samtools sort -o {output.bam} -" 
+
+rule featureCounts:
+    input:
+        bam = config["Quantification_Dir"] + "/{sample}.bam",
+        gtf = config["gtf"]
+    output:
+        count = config["Quantification_Dir"] + "/{sample}.count"
+    shell:
+        "Rscript script/run-featurecounts.R {input.bam} {input.gtf} {threads} " +
+        config["Quantification_Dir"] + "/{sample}"
+
+rule merge:
+    input:
+        counts = expand(config["Quantification_Dir"] + "/{sample}.count", sample = SAMPLES)
+    output:
+        gene_expr_matrix,
+        gene_counts_matrix
+    shell:
+        "perl script/abundance_estimates_to_matrix.pl --est_method featureCounts --quant_files {input.counts} --out_prefix my.gene;"
+        """sed -i "s/.count//g" {gene_expr_matrix};"""
+        """sed -i "s/.count//g" {gene_counts_matrix};"""
