@@ -1,0 +1,38 @@
+#############################################
+# Sample Info
+#############################################
+Raw_Data_Dir: raw_data
+Data_Dir: Preprocess
+SAMPLES_FILE: samples.txt # data after filter
+
+#############################################
+# Assembly
+#############################################
+TRINITY_HOME: /share/bioinfo/anaconda3/opt/trinity-2.8.4
+Assembly_Dir: Assembly
+trinity_max_memory: 500G
+busco_database: eukaryota_odb9
+transcripts: Assembly/corset.fasta # do not change
+gene_trans_map: Assembly/corset-clusters_trans_map.txt # do not change
+
+#############################################
+# Quantification
+#############################################
+Quantification_Dir: Quantification
+
+#############################################
+# Annotation
+#############################################
+EMAPPER_HOME: /pub/software/eggnog-mapper-1.0.3
+Annotation_Dir: Annotation
+Annotation_Input: Assembly/SuperDuper.fasta
+data_type: nucl #nucl | prot 
+
+#############################################
+# Expression Analysis
+#############################################
+ExprAnalysis_Dir: ExprAnalysis
+pc_num: 3
+de_method: DESeq2
+de_log2FoldChange: 1
+de_padj: 0.3
