@@ -1,0 +1,41 @@
+#############################################
+# Sample Info
+#############################################
+Raw_Data_Dir: raw_data
+Data_Dir: Preprocess
+SAMPLES_FILE: samples.txt # data after filter
+
+#############################################
+# Genome
+#############################################
+genome: ref/genome.fasta
+gtf: ref/genome.gtf
+
+#############################################
+# Mapping
+#############################################
+Mapping_Dir: Mapping
+
+#############################################
+# Quantification
+#############################################
+Quantification_Dir: Quantification
+
+#############################################
+# Annotation
+#############################################
+EMAPPER_HOME: /share/bioinfo/software/eggnog-mapper-1.0.3/
+Annotation_Dir: Annotation
+Annotation_Input: ref/protein_longest.fasta
+data_type: nucl #nucl | prot
+all_gene: ref/all_gene.txt
+
+#############################################
+# Expression Analysis
+#############################################
+TRINITY_HOME: /share/bioinfo/anaconda3/opt/trinity-2.8.4 
+ExprAnalysis_Dir: ExprAnalysis
+pc_num: 3
+de_method: DESeq2
+de_log2FoldChange: 1
+de_padj: 0.3
