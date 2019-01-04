@@ -7,6 +7,11 @@
         "output"    : "logs/cluster/{rule}.{wildcards}.out",
         "error"     : "logs/cluster/{rule}.{wildcards}.err"
     },
+    "trinity" :
+    {
+        "nCPUs"     : "24",
+        "memory"    : "500G"
+    },
     "emapper" :
     {
         "nCPUs"     : "24"

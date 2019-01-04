@@ -5,13 +5,12 @@ Data_Dir = config["Data_Dir"]
 Assembly_Dir = config["Assembly_Dir"]
 TRINITY_HOME= config["TRINITY_HOME"]
 SAMPLES_FILE = config["SAMPLES_FILE"]
-SAMPLES = config["SAMPLES"]
 trinity_max_memory = config["trinity_max_memory"]
 busco_database = config["busco_database"]
 
 rule trinity:
     input:
-        fq = expand(Data_Dir +"/{sample}_{pair}.fq.gz", sample=SAMPLES, pair=config["PAIRS"]),
+        fq = expand(Data_Dir +"/{sample}_{pair}.fq.gz", sample=SAMPLES, pair=[1, 2]),
     output:
         Assembly_Dir + "/trinity_out_dir.Trinity.fasta",
         Assembly_Dir + "/trinity_out_dir.Trinity.fasta.gene_trans_map"
@@ -55,7 +54,7 @@ rule salmon_quant:
 
 rule corset:
     input:
-        expand(Assembly_Dir + "/{sample}.out/aux_info/eq_classes.txt", sample=config["SAMPLES"])
+        expand(Assembly_Dir + "/{sample}.out/aux_info/eq_classes.txt", sample=SAMPLES)
     output:
         Assembly_Dir + "/corset-clusters.txt",
         Assembly_Dir + "/corset-counts.txt"

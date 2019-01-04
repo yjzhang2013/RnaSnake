@@ -1,13 +1,9 @@
 Data_Dir = config["Data_Dir"]
 Quantification_Dir = config["Quantification_Dir"]
 SAMPLES_FILE = config["SAMPLES_FILE"]
-SAMPLES = config["SAMPLES"]
 TRINITY_HOME = config["TRINITY_HOME"]
 transcripts = config["transcripts"]
 gene_trans_map = config["gene_trans_map"]
-
-gene_expr_matrix = config["gene_expr_matrix"]
-gene_counts_matrix = config["gene_counts_matrix"]
 
 rule trans_build:
     input:
@@ -52,10 +48,9 @@ rule merge_rsem:
     input:
         expand(Quantification_Dir + "/{sample}/RSEM.isoforms.results", sample=SAMPLES)
     output:
-        gene_expr_matrix,
-        gene_counts_matrix
+        gene_expr_matrix = config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix",
+        gene_counts_matrix = config["Quantification_Dir"] + "/my.gene.counts.matrix"
     shell:
         "{TRINITY_HOME}/util/abundance_estimates_to_matrix.pl"
         " --est_method RSEM --name_sample_by_basedir --gene_trans_map {gene_trans_map}"
-        " --out_prefix {Quantification_Dir}/my {input}"
-
+        " --out_prefix {Quantification_Dir}/my {input};"

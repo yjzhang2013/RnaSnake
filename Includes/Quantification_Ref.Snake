@@ -13,7 +13,7 @@ rule merge_featureCounts:
     input:
         counts = expand(config["Quantification_Dir"] + "/{sample}.count", sample = SAMPLES)
     output:
-        gene_expr_matrix = config["Quantification_Dir"] + "/my.gene.expr.matrix",
+        gene_expr_matrix = config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix",
         gene_counts_matrix = config["Quantification_Dir"] + "/my.gene.counts.matrix"
     shell:
         "perl script/abundance_estimates_to_matrix.pl --est_method featureCounts"

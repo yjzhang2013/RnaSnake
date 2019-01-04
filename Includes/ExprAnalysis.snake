@@ -13,7 +13,7 @@ rule sample_cor:
     shell:
         "mkdir -p {ExprAnalysis_Dir}/sample_cor;"
         "{TRINITY_HOME}/Analysis/DifferentialExpression/PtR"
-        " --matrix {gene_expr_matrix}"
+        " --matrix {input}"
         " --samples {SAMPLES_FILE}"
         " --min_rowSums 10"
         " --sample_cor_matrix"
@@ -28,7 +28,7 @@ rule pca:
     shell:
         "mkdir -p {ExprAnalysis_Dir}/pca;"
         "{TRINITY_HOME}/Analysis/DifferentialExpression/PtR"
-        " --matrix {gene_expr_matrix}"
+        " --matrix {input}"
         " --samples {SAMPLES_FILE}"
         " --min_rowSums 10"
         " --prin_comp {pc_num}"
