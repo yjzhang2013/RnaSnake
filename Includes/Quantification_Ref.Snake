@@ -1,0 +1,23 @@
+rule featureCounts:
+    input:
+        bam = config["Mapping_Dir"] + "/{sample}.bam",
+        gtf = config["gtf"]
+    output:
+        count = config["Quantification_Dir"] + "/{sample}.count"
+    threads: 6
+    shell:
+        "Rscript script/run-featurecounts.R {input.bam} {input.gtf} {threads} " +
+        config["Quantification_Dir"] + "/{wildcards.sample}"
+
+rule merge_featureCounts:
+    input:
+        counts = expand(config["Quantification_Dir"] + "/{sample}.count", sample = SAMPLES)
+    output:
+        gene_expr_matrix = config["Quantification_Dir"] + "/my.gene.expr.matrix",
+        gene_counts_matrix = config["Quantification_Dir"] + "/my.gene.counts.matrix"
+    shell:
+        "perl script/abundance_estimates_to_matrix.pl --est_method featureCounts"
+        " --out_prefix " + config["Quantification_Dir"] + "/my.gene"
+        " {input.counts};"
+        """sed -i "s/.count//g" {output.gene_expr_matrix};"""
+        """sed -i "s/.count//g" {output.gene_counts_matrix};"""

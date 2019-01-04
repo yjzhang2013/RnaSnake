@@ -1,0 +1,14 @@
+{
+    "__default__" :
+    {
+        "nCPUs"     : "4",
+        "memory"    : "10G",
+        "name"      : "JOBNAME.{rule}.{wildcards}",
+        "output"    : "logs/cluster/{rule}.{wildcards}.out",
+        "error"     : "logs/cluster/{rule}.{wildcards}.err"
+    },
+    "emapper" :
+    {
+        "nCPUs"     : "24"
+    }
+}

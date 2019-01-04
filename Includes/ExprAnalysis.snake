@@ -1,5 +1,3 @@
-gene_expr_matrix = config["gene_expr_matrix"] 
-gene_counts_matrix = config["gene_counts_matrix"] 
 TRINITY_HOME = config["TRINITY_HOME"]
 SAMPLES_FILE = config["SAMPLES_FILE"]
 ExprAnalysis_Dir = config["ExprAnalysis_Dir"]
@@ -8,7 +6,7 @@ de_method = config["de_method"]
 
 rule sample_cor:
     input:
-        gene_expr_matrix
+        config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix"
     output:
         ExprAnalysis_Dir + "/sample_cor/my.minRow10.sample_cor.dat",
         ExprAnalysis_Dir + "/sample_cor/my.minRow10.sample_cor_matrix.pdf"
@@ -23,7 +21,7 @@ rule sample_cor:
 
 rule pca:
     input:
-        gene_expr_matrix
+        config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix"
     output:
         ExprAnalysis_Dir + "/pca/my.minRow10.PCA.prcomp.scores",
         ExprAnalysis_Dir + "/pca/my.minRow10.prcomp.principal_components.pdf"
@@ -39,7 +37,7 @@ rule pca:
 
 rule deg:
     input:
-        gene_counts_matrix
+        config["Quantification_Dir"] + "/my.gene.counts.matrix"
     output:
         dynamic(ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{Case_vs_Control}.DESeq2.DE_results")
     shell:

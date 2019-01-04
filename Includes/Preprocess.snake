@@ -7,5 +7,6 @@ rule fastp:
         right = config["Data_Dir"] + "/{sample}_2.fq.gz",
         html = config["Data_Dir"] + "/{sample}.html",
         json = config["Data_Dir"] + "/{sample}.json"
+    log: config["Data_Dir"] + "/{sample}.log"
     shell:
-        "fastp -i {input.left} -I {input.right} -o {output.left} -O {output.right} -h {output.html} -j {output.json}"
+        "fastp -i {input.left} -I {input.right} -o {output.left} -O {output.right} -h {output.html} -j {output.json} 2>{log}"

@@ -21,7 +21,7 @@ gtfFile <- argv$gtf
 nthreads <- argv$threads
 outFilePref <- argv$out
 
-outStatsFilePath  <- paste(outFilePref, '.featureCounts.log',  sep = ''); 
+outStatsFilePath  <- paste(outFilePref, '.log',  sep = ''); 
 outCountsFilePath <- paste(outFilePref, '.count', sep = ''); 
 
 fCountsList = featureCounts(bamFile, annot.ext=gtfFile, isGTFAnnotationFile=TRUE, nthreads=nthreads, isPairedEnd=TRUE)
