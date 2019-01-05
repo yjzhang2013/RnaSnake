@@ -59,7 +59,7 @@ rule corset:
         Assembly_Dir + "/corset-clusters.txt",
         Assembly_Dir + "/corset-counts.txt"
     shell:
-        "corset -D 99999999999 -g " + ",".join(SAMPLES.values()) +
+        "corset -g " + ",".join(SAMPLES.values()) +
         " -n " + ",".join(SAMPLES.keys()) +
         " -i salmon_eq_classes " + 
         " -p {Assembly_Dir}/corset" +
@@ -94,6 +94,7 @@ rule fetchClusterSeqs:
         clusters = Assembly_Dir + "/corset-clusters.txt",
     output:
         corset_fa = Assembly_Dir + "/corset.fasta",
+        corset_longest_fa = Assembly_Dir + "/corset_longest.fasta",
         corset_fa_stat = Assembly_Dir + "/corset.fasta.txt"
     shell:
         "source activate py27;"
@@ -102,27 +103,34 @@ rule fetchClusterSeqs:
         " -t {input.all_cluster} "
         " -o {output.corset_fa} "
         " -c {input.clusters} ;"
+        "python2 tools/Corset-tools/fetchClusterSeqs.py"
+        " -l"
+        " -i {input.transcripts} "
+        " -t {input.all_cluster} "
+        " -o {output.corset_longest_fa} "
+        " -c {input.clusters} ;"
+ 
         "source deactivate;"
-	"perl script/CorsetStats.pl {output.corset_fa} > {output.corset_fa_stat}"
+	    "perl script/CorsetStats.pl {output.corset_fa} > {output.corset_fa_stat}"
 
-rule lace:
-    input:
-        transcripts = Assembly_Dir + "/trinity_out_dir.Trinity.fasta",
-        clusters = Assembly_Dir + "/corset-clusters.txt",
-    output:
-        Assembly_Dir + "/SuperDuper.fasta"
-    threads: 10
-    shell:
-        "Lace.py {input.transcripts} {input.clusters} -t --cores {threads} -o {Assembly_Dir}"
+#rule lace:
+#    input:
+#        transcripts = Assembly_Dir + "/trinity_out_dir.Trinity.fasta",
+#        clusters = Assembly_Dir + "/corset-clusters.txt",
+#    output:
+#        Assembly_Dir + "/SuperDuper.fasta"
+#    threads: 10
+#    shell:
+#        "Lace.py {input.transcripts} {input.clusters} -t --cores {threads} -o {Assembly_Dir}"
 
 rule busco:
     input:
-        Assembly_Dir + "/SuperDuper.fasta"
+        corset_longest_fa = Assembly_Dir + "/corset_longest.fasta"
     output:
         Assembly_Dir + "/run_busco/short_summary_busco.txt"
     shell:
         "cd {Assembly_Dir};"
-        "rm {busco_database}.tar.gz;"
+        "rm -f {busco_database}.tar.gz;"
         "wget https://busco.ezlab.org/datasets/{busco_database}.tar.gz;"
         "tar -zxf {busco_database}.tar.gz;"
         "cd ../ ;"
