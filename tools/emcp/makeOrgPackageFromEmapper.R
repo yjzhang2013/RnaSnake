@@ -220,7 +220,8 @@ my_orgdb <- makeOrgPackageFromEmapper(argv$annotation,
                                       genus = "M", 
                                       species = "y")
 
-if (requireNamespace(my_orgdb, quietly = TRUE))
+is.installed <- function(mypkg) is.element(mypkg, installed.packages()[,1]) 
+if (is.installed(my_orgdb))
   remove.packages(my_orgdb)
 install.packages(paste(argv$out_dir, my_orgdb, sep = "/"), repos = NULL)
 

@@ -4,6 +4,7 @@ library(argparser, quietly=TRUE)
 p <- arg_parser("do GO enrichment")
 
 # Add command line arguments
+p <- add_argument(p, "--orgdb_dir", help="orgDB build from emapper ", type="character")
 p <- add_argument(p, "--de_result", help="input de_result file, from run_DE_analysis.pl", type="character")
 p <- add_argument(p, "--de_log2FoldChange", help="log2FoldChange cutoff", type="numeric", default = 1)
 p <- add_argument(p, "--de_padj", help="adjust pvalue cutoff", type="numeric", default = 0.05)
@@ -17,7 +18,13 @@ out_prefix <- argv$de_result
 library(tidyverse)
 library(clusterProfiler)
 library(DOSE)
+
+is.installed <- function(mypkg) is.element(mypkg, installed.packages()[,1]) 
+if (! is.installed("org.My.eg.db"))
+	install.packages(paste(argv$orgdb_dir, "org.My.eg.db", sep = "/"), repos = NULL)
+
 library(org.My.eg.db)
+
 
 # load gene list or de_result ---------------------------------------------
 de_result <- read.delim(argv$de_result)

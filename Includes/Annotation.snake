@@ -4,22 +4,34 @@
 Annotation_Input = config["Annotation_Input"]
 Annotation_Dir = config["Annotation_Dir"]
 EMAPPER_HOME = config["EMAPPER_HOME"]
+diamond_nr_db = config["diamond_nr_db"]
+blast_method = "blastp"
+emapper_method = " "
 
-rule emapper:
+if config["data_type"] == "nucl":
+    blast_method = "blastx"
+    emapper_method = " --translate "
+
+
+rule emapper_search:
     input:
         Annotation_Input
     output:
+        Annotation_Dir + "/my.emapper.seed_orthologs"
+    threads: 32
+    shell:
+        "export PATH={EMAPPER_HOME}/bin:$PATH;"
+        "python2 {EMAPPER_HOME}/emapper.py -m diamond  -i {input} -o {Annotation_Dir}/my --cpu {threads} --no_annot --no_file_comments {emapper_method}"
+
+rule emapper_annot:
+    input:
+        Annotation_Dir + "/my.emapper.seed_orthologs"
+    output:
         Annotation_Dir + "/my.emapper.annotations"
     threads: 32
-    run:
-        cmd = "export PATH={EMAPPER_HOME}/bin:$PATH;"
-        cmd += "python2 {EMAPPER_HOME}/emapper.py -m diamond"
-        cmd += " -i {input} -o {Annotation_Dir}/my"
-        cmd += " --cpu {threads}"
-        if config["data_type"] == "nucl":
-            cmd += "--translate"
-
-        shell(cmd)
+    shell:
+        "export PATH={EMAPPER_HOME}/bin:$PATH;"
+        "python2 {EMAPPER_HOME}/emapper.py --annotate_hits_table {input} -o {Annotation_Dir}/my --cpu {threads} "
 
 rule makeOrgDB:
     input:
@@ -32,3 +44,13 @@ rule makeOrgDB:
         """grep -v "^# " {input.emapper} | sed "s/#//">{input.emapper}.clean;"""
         "Rscript tools/emcp/makeOrgPackageFromEmapper.R {input.emapper}.clean {input.all_gene} {Annotation_Dir};"
         "rm gene_annotation.RData"
+
+rule nr:
+    input:
+        Annotation_Input
+    output:
+        Annotation_Dir + "/my.nr.diamond.tab"
+    threads:
+        20
+    shell:
+        "diamond {blast_method} --threads {threads} --evalue 1e-10 --outfmt 6 -o {output} --query {input} --db {diamond_nr_db} --max-target-seqs 5" 

@@ -6,6 +6,7 @@ rule enrich:
     input:
         ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{Case_vs_Control}.DESeq2.DE_results"
     output:
-        ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{Case_vs_Control}.DESeq2.DE_results.ekp_results.txt"
+        ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{Case_vs_Control}.DESeq2.DE_results.ekp_results.txt",
+        ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{Case_vs_Control}.DESeq2.DE_results.ego_results.txt"
     shell:
-        "Rscript tools/emcp/enrich.R -d {input} --de_log2FoldChange {de_log2FoldChange} --de_padj {de_padj}"
+        "Rscript tools/emcp/enrich.R --orgdb_dir " + config["Annotation_Dir"] + " -d {input} --de_log2FoldChange {de_log2FoldChange} --de_padj {de_padj}"

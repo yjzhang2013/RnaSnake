@@ -129,10 +129,5 @@ rule busco:
     output:
         Assembly_Dir + "/run_busco/short_summary_busco.txt"
     shell:
-        "cd {Assembly_Dir};"
-        "rm -f {busco_database}.tar.gz;"
-        "wget https://busco.ezlab.org/datasets/{busco_database}.tar.gz;"
-        "tar -zxf {busco_database}.tar.gz;"
-        "cd ../ ;"
-        "run_busco -i {input} -m tran -l {Assembly_Dir}/{busco_database} -o busco;"
+        "run_busco -i {input} -m tran -l {busco_database} -o busco;"
         "mv run_busco {Assembly_Dir}/"
