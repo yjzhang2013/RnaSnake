@@ -14,8 +14,8 @@ EMAPPER_HOME: /share/bioinfo/software/eggnog-mapper-1.0.3
 #############################################
 # Genome, RNA-Seq ref
 #############################################
-#genome: ref/genome.fasta
-#gtf: ref/genome.gtf
+genome: ref/genome.fasta
+gtf: ref/genome.gtf
 
 #############################################
 # Annotation
