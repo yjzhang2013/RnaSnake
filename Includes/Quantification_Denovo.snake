@@ -8,20 +8,23 @@ rule rsem:
     input:
         config["Mapping_Dir"] + "/{sample}/bowtie2.bam"
     output:
-        Quantification_Dir + "/{sample}/RSEM.isoforms.results"
+        Quantification_Dir + "/{sample}.isoforms.results"
     threads: 4
     shell:
         "convert-sam-for-rsem {input} {input}.for_rsem;"
         "rsem-calculate-expression -p 8 --paired-end --bam --estimate-rspd --append-names"
-        " {input}.for_rsem.bam {transcripts} {Quantification_Dir}/{wildcards.sample}/RSEM"
+        " {input}.for_rsem.bam {transcripts} {Quantification_Dir}/{wildcards.sample}"
 
 rule merge_rsem:
     input:
-        expand(Quantification_Dir + "/{sample}/RSEM.isoforms.results", sample=SAMPLES)
+        expand(Quantification_Dir + "/{sample}.isoforms.results", sample=SAMPLES)
     output:
         gene_expr_matrix = config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix",
-        gene_counts_matrix = config["Quantification_Dir"] + "/my.gene.counts.matrix"
+        gene_counts_matrix = config["Quantification_Dir"] + "/my.gene.counts.matrix",
+        gene_expr_stat = config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix.stat.txt"
     shell:
         "{TRINITY_HOME}/util/abundance_estimates_to_matrix.pl"
-        " --est_method RSEM --name_sample_by_basedir --gene_trans_map {gene_trans_map}"
+        " --est_method RSEM --gene_trans_map {gene_trans_map}"
         " --out_prefix {Quantification_Dir}/my {input};"
+        "Rscript script/expressionStats.R -d {output.gene_expr_matrix} -o {output.gene_expr_matrix};"
+

@@ -38,8 +38,7 @@ rule makeOrgDB:
         emapper = Annotation_Dir + "/my.emapper.annotations",
         all_gene = config["all_gene"]
     output:
-        Annotation_Dir + "/anno_stat.txt",
-        directory(Annotation_Dir + "/org.My.eg.db")
+        Annotation_Dir + "/anno_stat.txt"
     shell:
         """grep -v "^# " {input.emapper} | sed "s/#//">{input.emapper}.clean;"""
         "Rscript tools/emcp/makeOrgPackageFromEmapper.R {input.emapper}.clean {input.all_gene} {Annotation_Dir};"
