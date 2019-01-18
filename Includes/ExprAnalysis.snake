@@ -4,6 +4,16 @@ ExprAnalysis_Dir = config["ExprAnalysis_Dir"]
 pc_num = config["pc_num"]
 de_method = config["de_method"]
 
+rule expr_stat:
+    input:
+        config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix"
+    output:
+        config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix.boxplot.pdf",
+        config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix.density.pdf",
+        config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix.stat.txt"
+    shell:
+        "Rscript script/expressionStats.R -d {input} -o {input}" 
+
 rule sample_cor:
     input:
         config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix"

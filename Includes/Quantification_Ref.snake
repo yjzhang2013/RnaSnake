@@ -14,12 +14,10 @@ rule merge_featureCounts:
         counts = expand(config["Quantification_Dir"] + "/{sample}.count", sample = SAMPLES)
     output:
         gene_expr_matrix = config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix",
-        gene_counts_matrix = config["Quantification_Dir"] + "/my.gene.counts.matrix",
-        gene_expr_stat = config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix.stat.txt"
+        gene_counts_matrix = config["Quantification_Dir"] + "/my.gene.counts.matrix"
     shell:
         "perl script/abundance_estimates_to_matrix.pl --est_method featureCounts"
         " --out_prefix " + config["Quantification_Dir"] + "/my.gene"
         " {input.counts};"
         """sed -i "s/.count//g" {output.gene_expr_matrix};"""
         """sed -i "s/.count//g" {output.gene_counts_matrix};"""
-        "Rscript script/expressionStats.R -d {output.gene_expr_matrix} -o {output.gene_expr_matrix};"
