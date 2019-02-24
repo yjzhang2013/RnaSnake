@@ -8,7 +8,7 @@ configfile: "config.yaml"
 ######################################################
 # read samples.txt to dict
 ######################################################
-SAMPLES = pd.read_table(config["SAMPLES_FILE"], header=None).set_index(1, drop=False)[0].to_dict()
+SAMPLES = pd.read_csv(config["SAMPLES_FILE"], header=None, sep="\t").set_index(1, drop=False)[0].to_dict()
 
 ######################################################
 # result files

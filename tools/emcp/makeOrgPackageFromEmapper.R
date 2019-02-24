@@ -219,12 +219,9 @@ my_orgdb <- makeOrgPackageFromEmapper(argv$annotation,
                                       tax_id = "0000", 
                                       genus = "M", 
                                       species = "y")
+dir.create("R_library")
+install.packages(paste(argv$out_dir, my_orgdb, sep = "/"), repos = NULL, lib = "R_library")
 
-is.installed <- function(mypkg) is.element(mypkg, installed.packages()[,1]) 
-if (is.installed(my_orgdb))
-  remove.packages(my_orgdb)
-install.packages(paste(argv$out_dir, my_orgdb, sep = "/"), repos = NULL)
-
-library(my_orgdb, character.only = TRUE)
+library(my_orgdb, character.only = TRUE, lib.loc = "R_library")
 
 annoStat()

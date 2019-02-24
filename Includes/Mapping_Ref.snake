@@ -4,7 +4,7 @@ rule hisat2_build:
     output:
         expand(config["genome"] + ".{index}.ht2", index = range(1,9))
     log:
-        config["Quantification_Dir"] + "/hisat2-build.log"
+        config["Mapping_Dir"] + "/hisat2-build.log"
     shell:
         "hisat2-build {input.genome} {input.genome} 1>{log} 2>&1"
 
@@ -24,15 +24,15 @@ rule hisat2:
         " samtools view -Sb - | "
         " samtools sort -o {output.bam} -" 
 
-rule QoRTs:
-    input:
-        genome = config["genome"],
-        gtf = config["gtf"],
-        left = config["Data_Dir"] + "/{sample}_1.fq.gz",
-        right = config["Data_Dir"] + "/{sample}_2.fq.gz",
-        bam = config["Mapping_Dir"] + "/{sample}.bam"
-    output:
-    shell:
-        "qorts QC --generatePlots"
-        " --genomeFA {input.genome}"
-        " --rawfastq {input.left},{input.right} {input.bam} {input.gtf} config["Mapping_Dir"] + "/{wildcards.sample}"
+#rule QoRTs:
+#    input:
+#        genome = config["genome"],
+#        gtf = config["gtf"],
+#        left = config["Data_Dir"] + "/{sample}_1.fq.gz",
+#        right = config["Data_Dir"] + "/{sample}_2.fq.gz",
+#        bam = config["Mapping_Dir"] + "/{sample}.bam"
+#    output:
+#    shell:
+#        "qorts QC --generatePlots"
+#        " --genomeFA {input.genome}"
+#        " --rawfastq {input.left},{input.right} {input.bam} {input.gtf} " + config["Mapping_Dir"] + "/{wildcards.sample}"

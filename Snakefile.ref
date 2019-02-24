@@ -8,19 +8,19 @@ configfile: "config.yaml"
 ######################################################
 # read samples.txt to dict
 ######################################################
-SAMPLES = pd.read_table(config["SAMPLES_FILE"], header=None).set_index(1, drop=False)[0].to_dict()
+SAMPLES = pd.read_csv(config["SAMPLES_FILE"], header=None, sep="\t").set_index(1, drop=False)[0].to_dict()
 
 ######################################################
 # result files
 ######################################################
 rule all:
     input:
-        config["Annotation_Dir"] + "/my.emapper.annotations",                										# eggnog-mapper annotation result
-        directory(config["Annotation_Dir"] + "/org.My.eg.db"),               										# OrgDb build from eggnog-maper result
-        config["Annotation_Dir"] + "/anno_stat.txt",                         										# annotation statistics
-        config["Annotation_Dir"] + "/my.nr.diamond.tab",                     										# nr blast result
+        #config["Annotation_Dir"] + "/my.emapper.annotations",                										# eggnog-mapper annotation result
+        #config["Annotation_Dir"] + "/anno_stat.txt",                         										# annotation statistics
+        #config["Annotation_Dir"] + "/my.nr.diamond.tab",                     										# nr blast result
         config["Quantification_Dir"] + "/my.gene.counts.matrix",             										# gene counts matrix
         config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix",           										# TMP and TMM normalized matrix
+        config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix.stat.txt",
         config["ExprAnalysis_Dir"] + "/sample_cor/my.minRow10.sample_cor.dat",										# sample correlation
         config["ExprAnalysis_Dir"] + "/sample_cor/my.minRow10.sample_cor_matrix.pdf",								# sample correlation plot
         config["ExprAnalysis_Dir"] + "/pca/my.minRow10.PCA.prcomp.scores",											# sample PCA
@@ -33,7 +33,7 @@ rule all:
 # Includes
 ######################################################
 include: "Includes/Preprocess.snake"
-include: "Includes/Annotation.snake"
+#include: "Includes/Annotation.snake"
 include: "Includes/Mapping_Ref.snake"
 include: "Includes/Quantification_Ref.snake"
 include: "Includes/ExprAnalysis.snake"
