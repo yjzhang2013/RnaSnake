@@ -18,11 +18,11 @@ library(tidyverse)
 library(clusterProfiler)
 library(DOSE)
 library(pathview)
-is.installed <- function(mypkg) is.element(mypkg, installed.packages()[,1]) 
-if (! is.installed("org.My.eg.db"))
-	install.packages(paste(argv$orgdb_dir, "org.My.eg.db", sep = "/"), repos = NULL)
 
-library(org.My.eg.db)
+dir.create("R_library", recursive = TRUE)
+install.packages(paste(argv$orgdb_dir, "org.My.eg.db", sep = "/"), repos = NULL, lib = "R_library")
+
+library(org.My.eg.db, lib.loc = "R_library")
 
 
 # load gene list or de_result ---------------------------------------------
@@ -49,7 +49,7 @@ ego <- enrichGO(gene          = deg,
 
 ego_results<-as.data.frame(ego)
 write.table(ego_results, file = paste(out_prefix, "ego_results.txt", sep = "."),
-            quote = F)
+            quote = F, sep = "\t")
 
 pdf(file = paste(out_prefix, "ego_barplot.pdf", sep = "."))
 barplot(ego, showCategory=20, x = "GeneRatio")
@@ -85,7 +85,7 @@ ekp <- enricher(deg,
 
 ekp_results <- as.data.frame(ekp)
 write.table(ekp_results, file = paste(out_prefix, "ekp_results.txt", sep = "."),
-            quote = F)
+            quote = F, sep = "\t")
 
 pdf(file = paste(out_prefix, "ekp_barplot.pdf", sep = "."))
 barplot(ekp, showCategory=20, x = "GeneRatio")
