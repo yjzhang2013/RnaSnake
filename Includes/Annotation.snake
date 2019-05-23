@@ -36,13 +36,14 @@ rule emapper_annot:
 rule makeOrgDB:
     input:
         emapper = Annotation_Dir + "/my.emapper.annotations",
-        all_gene = config["all_gene"]
+        Annotation_Input = Annotation_Input
     output:
         Annotation_Dir + "/anno_stat.txt"
     shell:
-        """grep -v "^# " {input.emapper} | sed "s/#//">{input.emapper}.clean;"""
-        "Rscript tools/emcp/makeOrgPackageFromEmapper.R {input.emapper}.clean {input.all_gene} {Annotation_Dir};"
-        "rm gene_annotation.RData"
+        "cd {Annotation_Dir} ;"
+        "Rscript ../tools/emcp/makeOrgPackageFromEmapper.R my.emapper.annotations;"
+        "Rscript ../tools/emcp/AnnoStat.R ../{input.Annotation_Input};"
+        "cd ..;"
 
 rule nr:
     input:
