@@ -1,8 +1,7 @@
 #############################################
 # Sample Info
 #############################################
-Raw_Data_Dir: raw_data    # data before filter
-Data_Dir: Preprocess      # data after filter
+Data_Dir: Data      # data after filter
 SAMPLES_FILE: samples.txt # data after filter
 
 #############################################
@@ -23,7 +22,6 @@ gtf: ref/genome.gtf
 Annotation_Dir: Annotation
 Annotation_Input: ref/protein_longest.fasta
 data_type: prot #nucl | prot 
-all_gene: ref/all_gene.txt
 diamond_nr_db: /share/bioinfo/database/diamond_db/nr
 
 #############################################
@@ -44,3 +42,4 @@ pc_num: 3
 de_method: DESeq2
 de_log2FoldChange: 1
 de_padj: 0.05
+contrasts: contrasts.txt

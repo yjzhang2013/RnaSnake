@@ -10,14 +10,26 @@ configfile: "config.yaml"
 ######################################################
 SAMPLES = pd.read_csv(config["SAMPLES_FILE"], header=None, sep="\t").set_index(1, drop=False)[0].to_dict()
 
+f = open(config['contrasts'], 'r')
+CONTRASTS = [i.strip().replace('\t', '_vs_') for i in f.readlines()]
+
+
+######################################################
+# Includes
+######################################################
+include: "Includes/Annotation.snake"
+include: "Includes/Mapping_Ref.snake"
+include: "Includes/Quantification_Ref.snake"
+include: "Includes/ExprAnalysis.snake"
+
 ######################################################
 # result files
 ######################################################
 rule all:
     input:
-        #config["Annotation_Dir"] + "/my.emapper.annotations",                										# eggnog-mapper annotation result
-        #config["Annotation_Dir"] + "/anno_stat.txt",                         										# annotation statistics
-        #config["Annotation_Dir"] + "/my.nr.diamond.tab",                     										# nr blast result
+        config["Annotation_Dir"] + "/my.emapper.annotations",                										# eggnog-mapper annotation result
+        config["Annotation_Dir"] + "/anno_stat.txt",                         										# annotation statistics
+        config["Annotation_Dir"] + "/my.nr.diamond.tab",                     										# nr blast result
         config["Quantification_Dir"] + "/my.gene.counts.matrix",             										# gene counts matrix
         config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix",           										# TMP and TMM normalized matrix
         config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix.stat.txt",
@@ -25,16 +37,5 @@ rule all:
         config["ExprAnalysis_Dir"] + "/sample_cor/my.minRow10.sample_cor_matrix.pdf",								# sample correlation plot
         config["ExprAnalysis_Dir"] + "/pca/my.minRow10.PCA.prcomp.scores",											# sample PCA
         config["ExprAnalysis_Dir"] + "/pca/my.minRow10.prcomp.principal_components.pdf",							# sample PCA plot
-        dynamic(config["ExprAnalysis_Dir"] + "/deg/my.gene.counts.matrix.{Case_vs_Control}.DESeq2.DE_results"),		# different expression gene analysis
-        dynamic(config["ExprAnalysis_Dir"] + "/deg/my.gene.counts.matrix.{Case_vs_Control}.DESeq2.DE_results.ekp_results.txt")	# 
-
-
-######################################################
-# Includes
-######################################################
-include: "Includes/Preprocess.snake"
-#include: "Includes/Annotation.snake"
-include: "Includes/Mapping_Ref.snake"
-include: "Includes/Quantification_Ref.snake"
-include: "Includes/ExprAnalysis.snake"
-include: "Includes/Enrichment.snake"
+        expand(ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{vs}.DESeq2.DE_results", vs=CONTRASTS),
+        expand(ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{vs}.DESeq2.DE_results.ekp_results.txt", vs = CONTRASTS)

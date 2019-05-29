@@ -1,8 +1,7 @@
 #############################################
 # Sample Info
 #############################################
-Raw_Data_Dir: raw_data    # data before filter
-Data_Dir: Preprocess      # data after filter
+Data_Dir: Data      	  # data after filter
 SAMPLES_FILE: samples.txt # data after filter
 
 #############################################

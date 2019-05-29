@@ -174,7 +174,7 @@ elsif ($est_method =~ /^featureCounts/) {
     $acc_field = "gene_id";
     $counts_field = "counts";
     $fpkm_field = "fpkm";
-    $tpm_field = "tmp";
+    $tpm_field = "tpm";
 }
 else {
     die "Error, dont recognize --est_method [$est_method] ";
@@ -236,6 +236,8 @@ main: {
     foreach my $file (@filenames) {
         # also, get rid of the part of the filename that RSEM adds
         $file =~ s/\.(genes|isoforms)\.results$//;
+	# featureCounts
+        $file =~ s/\.count$//;
     }
     
 

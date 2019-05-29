@@ -45,13 +45,33 @@ rule pca:
         " --add_prin_comp_heatmaps 10"
         " --output {ExprAnalysis_Dir}/pca/my"
 
+contrasts = config["contrasts"]
+f = open(contrasts, 'r')
+CONTRASTS = [i.strip().replace('\t', '_vs_') for i in f.readlines()]
+
 rule deg:
     input:
         config["Quantification_Dir"] + "/my.gene.counts.matrix"
     output:
-        dynamic(ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{Case_vs_Control}.DESeq2.DE_results")
+        expand(ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{vs}.DESeq2.DE_results", vs = CONTRASTS)
     shell:
         "perl {TRINITY_HOME}/Analysis/DifferentialExpression/run_DE_analysis.pl"
         " --matrix {input} --method {de_method}"
         " --samples_file {SAMPLES_FILE}"
+        " --contrasts  {contrasts}"
         " --output {ExprAnalysis_Dir}/deg"
+
+de_log2FoldChange = config["de_log2FoldChange"]
+de_padj = config["de_padj"]
+ExprAnalysis_Dir = config["ExprAnalysis_Dir"]
+
+rule enrich:
+    input:
+        config["Annotation_Dir"] + "/anno_stat.txt",
+        des = expand(ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{vs}.DESeq2.DE_results", vs = CONTRASTS)
+    output:
+        expand(ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{vs}.DESeq2.DE_results.ekp_results.txt", vs = CONTRASTS),
+        expand(ExprAnalysis_Dir + "/deg/my.gene.counts.matrix.{vs}.DESeq2.DE_results.ego_results.txt", vs = CONTRASTS)
+    run:
+        for i in input.des:
+            shell("cd " + config["Annotation_Dir"] + "; Rscript ../tools/emcp/enrich.R -d ../{i} --de_log2FoldChange {de_log2FoldChange} --de_padj {de_padj}; cd ..")

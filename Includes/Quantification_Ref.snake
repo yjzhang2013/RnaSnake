@@ -6,7 +6,7 @@ rule featureCounts:
         count = config["Quantification_Dir"] + "/{sample}.count"
     threads: 6
     shell:
-        "Rscript script/run-featurecounts.R {input.bam} {input.gtf} {threads} " +
+        "Rscript script/run-featurecounts.R -b {input.bam} -g {input.gtf} -o " +
         config["Quantification_Dir"] + "/{wildcards.sample}"
 
 rule merge_featureCounts:
@@ -19,5 +19,3 @@ rule merge_featureCounts:
         "perl script/abundance_estimates_to_matrix.pl --est_method featureCounts"
         " --out_prefix " + config["Quantification_Dir"] + "/my.gene"
         " {input.counts};"
-        """sed -i "s/.count//g" {output.gene_expr_matrix};"""
-        """sed -i "s/.count//g" {output.gene_counts_matrix};"""
