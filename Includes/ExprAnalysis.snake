@@ -4,6 +4,8 @@ ExprAnalysis_Dir = config["ExprAnalysis_Dir"]
 pc_num = config["pc_num"]
 de_method = config["de_method"]
 
+localrules: enrich
+
 rule expr_stat:
     input:
         config["Quantification_Dir"] + "/my.gene.TMM.EXPR.matrix"
