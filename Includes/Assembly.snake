@@ -1,3 +1,4 @@
+import os
 ######################################################
 # RNA-Seq Denovo Assembly
 ######################################################
@@ -7,6 +8,8 @@ TRINITY_HOME= config["TRINITY_HOME"]
 SAMPLES_FILE = config["SAMPLES_FILE"]
 trinity_max_memory = config["trinity_max_memory"]
 busco_database = config["busco_database"]
+
+localrules: trinity_stat, fetchClusterSeqs 
 
 rule trinity:
     input:
@@ -36,21 +39,21 @@ rule salmon_index:
     input:
         Assembly_Dir + "/trinity_out_dir.Trinity.fasta"
     output:
-        directory(Assembly_Dir + "/trinity_out_dir.Trinity")
-    shell:
-        "salmon index --index {output} --transcripts {input}"
+        index_log = Assembly_Dir + "/trinity_out_dir.Trinity/indexing.log"
+    run:
+        salmon_index_dir = os.path.dirname(output.index_log)
+        shell("salmon index --index {salmon_index_dir} --transcripts {input}")
 
 rule salmon_quant:
     input:
-        directory(Assembly_Dir +"/trinity_out_dir.Trinity"),
+        index_log = Assembly_Dir +"/trinity_out_dir.Trinity/indexing.log",
         left = Data_Dir + "/{sample}_1.fq.gz",
         right = Data_Dir + "/{sample}_2.fq.gz"
     output:
         Assembly_Dir + "/{sample}.out/aux_info/eq_classes.txt"
-    shell:
-        "salmon quant --index {input} -l A --dumpEq " +
-        " -1 {input.left} -2 {input.right}"
-        " --output {Assembly_Dir}/{wildcards.sample}.out"
+    run:
+        salmon_index_dir = os.path.dirname(input.index_log)
+        shell("salmon quant --index {salmon_index_dir} -l A --dumpEq  -1 {input.left} -2 {input.right}  --output {Assembly_Dir}/{wildcards.sample}.out")
 
 rule corset:
     input:
@@ -109,8 +112,8 @@ rule fetchClusterSeqs:
         " -t {input.all_cluster} "
         " -o {output.corset_longest_fa} "
         " -c {input.clusters} ;"
- 
         "source deactivate;"
+
 	    "perl script/CorsetStats.pl {output.corset_fa} > {output.corset_fa_stat}"
 
 #rule lace:
