@@ -95,13 +95,13 @@ rule fetchClusterSeqs:
         transcripts = Assembly_Dir + "/trinity_out_dir.Trinity.fasta",
         all_cluster = Assembly_Dir + "/corset-all_clusters.txt",
         clusters = Assembly_Dir + "/corset-clusters.txt",
+        clusters_trans_map = Assembly_Dir + "/corset-clusters_trans_map.txt"
     output:
         corset_fa = Assembly_Dir + "/corset.fasta",
         corset_longest_fa = Assembly_Dir + "/corset_longest.fasta",
         corset_fa_stat = Assembly_Dir + "/corset.fasta.txt"
     shell:
-        "source activate py27;"
-        "python2 tools/Corset-tools/fetchClusterSeqs.py"
+        "python tools/Corset-tools/fetchClusterSeqs.py"
         " -i {input.transcripts} "
         " -t {input.all_cluster} "
         " -o {output.corset_fa} "
@@ -110,10 +110,10 @@ rule fetchClusterSeqs:
         " -l"
         " -i {input.transcripts} "
         " -t {input.all_cluster} "
-        " -o {output.corset_longest_fa} "
+        " -o temp.fasta "
         " -c {input.clusters} ;"
-        "source deactivate;"
 
+        "perl script/FastA.rename.pl {input.clusters_trans_map} temp.fasta >{output.corset_longest_fa};"
 	    "perl script/CorsetStats.pl {output.corset_fa} > {output.corset_fa_stat}"
 
 #rule lace:
